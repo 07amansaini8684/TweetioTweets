@@ -1,0 +1,101 @@
+// create a backend and frontend folder and install neccessory packeges and create a app by vite in the forntend folder
+// but this time we create packages in the main folder instead of the backend folder 
+// the do neccessory setting in the packagejson file 
+// then check if the app is working
+// then we made folder for routes and controllers 
+// then made auth controller and import them in the routes folder and connect the route foler to the main js file which is in our case is server.js file because this project is quite big we have to follow the best practices instead of making every controller in one file 
+// now connnect with the database example mongodb
+// we can make a seperate folder for that where we can make that function and don't forget to add try catch and write your sensitive infomation in the dotenv file it will be better and secure and we can includer dotenv file and nodmodule in the gitignore so that no one can access the your sensitive information
+/// then write the register or signUp controller so that people can make account but the info is valid if it's not give the error also check if the user is already exist or not if it is again give the error then hash the password and now this time we make token for cookie in the signup processs so that we can directly redirect the user to the home page instead of asking info again in the login process , you can create a seperate function for generating the token it on yours it's just a good practice  to make it seperate
+// create a jwt token in that function and export it then import it in the auth.controller
+// then check it in the postman extention if it is woking or not
+// if it is working we can move to the next step 
+// now its time to make login functionality , as usaual get data form the body , found the user on the basis of it if user not found send the response json 
+// if user found then check the password if it is correct or not if it is correct then generate token by the function which we have already created that's why we have created in the seperate file to use the function again 
+/// create a logout functionality in which we just clear the toke from the cookie
+/// next we have to create a controller or you can say a middleware, the use of this middleware is to check if the user is authenticated by check if he has the token 
+/// if someone is reading there is a problem i don't know why is this type of problem arising but in this project i can't access the value of .env file in the other file accept the server file or you the main backend file which i created , the only  solution i find is to import dotenv and setup the config in that file where you need that info , if you understand what i am saying 
+/// sooo next review the code , if it is correct we can move to the next part 
+
+///////////////////////////////////////////////////////////////////////////
+
+// now we have to create the user routes and all thing for users
+// so create a user.route import it in the sever file set the url like (api/user, userRoutes) then make functions in the import controllers inthe user route file and make a userController file in which you are going to make the controllers
+// now create the function of user profile the id will come from the rq.params
+// then we can create the function for follow and unfollow , first find ourUser and the other user again the id of the other user will come int he params and put check if it is found or not , then after all this make a varible isFollowing and check not check like hmmmmm ourUser' following inclues that the other user , now make a condition on the basis of that if is is include so remove the user and if it is not include the user - it's that simple , if you understand
+/// also if you want to send the notification make a notification model and the put it in the follow logic 
+// and now its done we can move to the next controller
+// so the next is making the suggested user controller and this will be one of the intreseting function , first we find ouserlf the loggedin user and then extract the following field form it the we randomly take users form  the data base using aggregation pipline and exclude or id from it , then what we have to do is check if the users which are comming from the database are already followed by logged in user if it is not the we take them in a variable and slice some user from it and send in the response, then check it in  the postman if it is working
+// next the updateporfiel function or controller whatevery you say it will not be that easy first check this basic requirement like extracting info from the req.body
+// then check if the user is exist or not if it is exist then update the info such as password the new and the old compare the given password by the tha password from the user that found and then grab the profileImg and coverImg then using cloudinary uploader upload then on the coludinary and don't forget to delete the previous img , then grab other details and update the user , but here instead of using mongodb's findOneAndUpdate we are just saving the info directly both method are correct both have to pros and cons you should definetly check out that , you can ask chat gpt .
+// then check it in the postman if it is working
+///////////////////////////////////
+now it's time to make post model and routes
+// so first we create post model using mongoose put whatever you want in your post like text , img , the owner who post the posts just add the user objecId and ref the User ,then likes again the same , then comments its also same but we have text also in that
+//then create routes as we did in the user part 
+// now controllers Post controller and the there will be createPost, likeUnlikePost, commentOnPost, deletePost
+// now inthe create post we have to first grab the incomming info like text and img and don't forget to grab the user id from the req.user._id then first check if the user exist or not
+then upload the img on the cloudinary and then create the post
+/// after this there is delete post , get the id of the post from the param get the userId from the req.body then check if the user whose id you have recevied is the owner of that post if not return the res , then delete the img form the cloudinary and then after this just delete the post and return the response
+// then comment on the post , similarly find the post grab the user then check if there is any text provided then if the post exist if not you know what to do just return the res error and mssg , if you find the post the create a comment and push it in the comments field of the post simpleeeeeeeeeeeeee
+// then for the liking the post , repeat the same step but when you have the post check if the userid is include in the like array of the post which we have have created ,then write the condition if the userliked the post runn the function and pull the userid form the post's likes and if not push the userid the pull push is from the mongoose incase if you don't know
+/// now there is one more route is left which is getallpost , it is simple to get all post just use findOne without any sepecific info but there is a intreseting thing to learn firt you have to find the all post also sort it by createdAt = -1 , and then when you try to find the all post in the postman you will get the all post but you will get only userId as the user info who created that post let's solve this what we have to do is populate the field of the user and you will get the alll info about that user but but you have to deselcet the password because we don't want to pass the password in the response
+// now we have to get the all post which user liked, so first going back in the likeUnlike route and make the conditon like this when we like the post we find our user and pushes the id of post in the likedPost array of the user and vice versa
+now the question is who we an find the post which the user liked const likedPosts = await Post.find({_id : {$in: user.likedPosts}}) this like helps to find the liked post so $in , let me tell you how its work so the $in operator match the field of the in our case the post so it match the _id which is the field of the post in the user.likedPosts array and give us those posts int he likedPost or whatever you named that valiable , if you understand then that's good other wise paste this line in the chatgpt it will tell you with example
+//// now we have to grab all the post of following user posts, so let's do this , first asusual do the same grab id find user boriingggg then grab the following field from the loggedin user and match the userid's in the folling with the userId field of the posts it is exatly same as the previous one 
+//// now we have to get the all post of user this time we do this by username because we are not only finding the posts of loggedIn user but of other user also
+///////////////////
+now this is all about the post controller
+///////////////////////////////////////////////// 
+// now for the notification , make routes file then import it in the server js file and then make controller in the notificationRoutes file then make some controller
+// now getting all notification which is send to our user 
+// then delete the the notification 
+so now our backend part is finished and we can move to the forntend part 
+/////////////////////////////////////forntend////////////////////////////
+so first bring the imgs that you want to put on your profile and posts
+// so i got to know that you can change your url to something like 4000, or 4500 anything just write this in the   server:{
+    port:5000,
+  }in the vite config
+
+/// now install the tailwind css for the best practice and to work fast the classes and next we have a new lib to leran the desiyUi its a tailwind lib which make our work easy now no need to write long classes , you should definetly check out that,
+// now install the react-icons and react-router-dom for the routing and icons
+// then create pages in the pages folder but try to work professionaly or more i am not getting that word the sturucture will be Pages->authFolder-singupfolder-signupPage.jsx similarly for the login in the authFolder and home page in the page-homeflder-homePage.jsx and then import them in the app.jsx file
+// In this i am not going to tell you each line of the ui you can do it your self or just copy form my github , if you are reading this i have uploaded this already , and you can also vist the daisyUi website there they have components you can just copy from the
+// now i have made all the pages and components 
+/// now in this app we are going to use react Query not the react redux let's see how it works 
+// so first install the react query and then import QueryClient form the tanstack/react-query and also the QueryClientProvider to wrap or app in it 
+/// now in the signUp , we have to add useMutation and useQuery
+useMutation - you use it when you need to manulpate the data or CURD operation , if you know what is CURD operation 
+useQuery - you use it when you need to fetch the data from the server
+// now first for the useMutation we use and function in it name mutationFn that's a async function
+// now fetching the info from the signUp but for that we have to setup the proxy in the vite config , then we are now using fetch to fetch and send the info 
+/// for the just writing console error we are using a package - the name is react-hot-tost , you can check it out on the npm 
+then check if it's working or not after creating the function and passing the data
+////////// Now Login
+// its simmiler to the signUp 
+// then the logout is also simmiler in the logout we have just call that route and no need to send any data there 
+//////////// Now for the protected route , in app.jsx we user useQuery which is use to fetch some data and send the get request I said get request we use useQuery ||
+// so we use useQuery and fetch the user data and then we use the data to render the
+// now whenever we are change tab it again send the req ,this is default behviour of react query, so to get rid of it we have to make it refetchOnWindowFocus: false, false in the main.jsx file where we setup our QueryClient
+// so now when we click on the login we are not redirecting on the page ,so we need to fix that , so for that in the loginPage we will use invalidateQueries in order to refetch the authUser, so first use useQueryClient put it in the variable and then use it in the onSucess function
+// and to make it work when you click the logout button you have to set the data null 
+// now to get the data of the post we have again deal with useQuery because we making get request so what you can do is either fetch the data seperatly, but we are fetching the data conditionaly on the basis of feed type ,if it is all the post we made a condition if the feedtype is allPost we are getting the data of all the post form the route we had made in the backend and if it is following we had already made that route to you can use switch cases but i made it using the if else condition but, one main thing you have to do is when you switch the tab means the foy you and following tab you have to refecth the data that's the main thing
+// now what the problem we have is we can see the delete button even we are not the owner of that post so what we have to do is just check if out id matchs with the post's user id then by conditionals we can do that , 
+// then we have delete the post , we are not going to do to much we have to call that route and pass the id of that post , we use useMutation for this because we are not making get request and sending back the postid , but when we delete the post we are not seeing the ui change we have to refresh the page to see the changes so what we can do is we have to apply the same method the invalidateQueries we have to use this so that it trigger the react query and try to refetch the data so that we have updating state
+/// Create Post 
+the process is the same in the creating is the use
+// we use the useMutation because we have to send the info to backend and then we will recevie the res and because we have all ready hangle post.jsx and posts.jsx we don't have to worie about that , just keep in the mind when you create the post don't forget to use invalidateQueries of posts so that it will update the ui , are you understanding what i am saying 
+// then by using useMutation we can show our suggested user on the right pannel , check out my code if you want more info it is same as we had already use this thing in the posts 
+// so it's time to make the follow and unfollow functionality so because we are going to use the functionality in more than one place we make it as a custome hook and then we will pass the values like userId 
+// now for the like
+so that's all the same part useMutation get the response and checking if it is liked by the authUser id if it is there that means he liked the post and vice versa , but there is a problem there when we useMutation  we are using invalidateQueries to refecth the all data again so that it update the ui but now what happening when we try to like everthing is working find but there is issue of userexpreience after the click the invalidateQueries refatch all the post and make the page refresh ,now let's see how can we solve the problem, ok now what we have to do is we have to change logic in the backend we have to send res of updated like array and then after sending that we can on the fontend side by using setQueryData instead of invalidateQueries we can get the old data from the cached and update it 
+// comment is also the same function just we have to send the state text in the json to backend
+// and now you can create a function which will calclulate the time when the post was made you can calclulate by passing the post.createdAt to the function just ask the chat gpt and it will made it for you 
+// now for the notification page , its all the same one useQuery to get the all the notification and one useMutation to delelte all the notification 
+// the profile page is also simmiler we can update the profile using useMutataion , but there is a post and likes section under the profile page , so what you have to do is go in the posts.jsx and make to feed also likes and the posts and call your backend route on it and there in one route you have to pass the username and other is userId because that is how we made the function so when you pass the username you will get all the post of user whose username you pass and simmilerly for the id and don't forget to add the feedtype as the prop and yess all this info will come as a profile which you will send from the profile
+// then you know how to handel the editPorifle page now you know everthing about this app how we made this , you can add editional features in it as per you wish 
+// Now if you are reading this and have any doubt you can contact me on twiter or instagram or anywhere 
+// I tried my best to explain not every single word but the steps who we were making this website and yes if you learn anything from this you can follow me i will put the video link here from where i got that resoureces and where i learned the tanstack query 
+video link - https://www.youtube.com/watch?v=4GUVz2psWUg&t=15604s 
+follow me of twitter - https://x.com/07_amansaini
+instagram - i will put this link later 
